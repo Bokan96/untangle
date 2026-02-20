@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<!-- saved from url=(0038)https://www.jasondavies.com/planarity/ -->
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Planarity - Jason Davies</title>
+  <link href="./files/button.css" rel="stylesheet">
+  <style>
+    html,
+    body {
+      font-family: sans-serif;
+    }
+
+    h1 {
+      font-weight: 300;
+    }
+
+    circle {
+      fill: #fc0;
+      cursor: move;
+      stroke: #000;
+      stroke-width: 1.5px;
+    }
+
+    circle.intersection {
+      fill: #0cf;
+    }
+
+    circle.connected {
+      fill: #f00 !important;
+    }
+
+    line {
+      stroke: #fc0;
+      stroke-width: 1.5px;
+    }
+
+    line.intersection {
+      stroke: #000;
+    }
+  </style>
+
+</head>
+
+<body>
+  <div id="info">
+    <h1>Planarity</h1>
+    <p>Can you untangle the graph? See if you can position the vertices so that no two lines cross.
+    </p>
+    <p>Number of line crossings detected: <span id="count">19.</span>
+    </p>
+    <p style="font-style: italic"><span id="move-count">12 moves</span> taken in <span id="timer">76.0</span>s.
+    </p>
+    <p><label for="nodes">Number of vertices:</label>
+      <input type="number" value="8" id="nodes" min="4">
+      <button id="generate" class="first last">Generate new, random graph</button>
+    </p>
+    <p><label for="intersections"><input type="checkbox" id="intersections"> Highlight non-intersecting lines</label>.
+    </p>
+    <p>Don't worry, the game only generates solvable graphs! These are known as <a
+        href="http://en.wikipedia.org/wiki/Planar_graph">planar graphs</a>.
+    </p>
+  </div>
+  <div id="vis"><svg width="1026" height="552">
+      <g transform="translate(10,10)">
+        <g>
+          <line x1="384.38219236314904" y1="231.9346979572418" x2="819.9220555646746" y2="436.680797662757"
+            class="intersection"></line>
+          <line x1="253.02223853352336" y1="321.0481878492594" x2="253.02223853352336" y2="321.0481878492594"
+            class="intersection"></line>
+          <line x1="819.9220555646746" y1="436.680797662757" x2="819.9220555646746" y2="436.680797662757"
+            class="intersection"></line>
+          <line x1="854.64629621384" y1="285.23277121525405" x2="819.9220555646746" y2="436.680797662757"
+            class="intersection"></line>
+          <line x1="335.9563369758159" y1="362.8963136677337" x2="421.06559084591174" y2="458.186340353671"
+            class="intersection"></line>
+          <line x1="421.06559084591174" y1="458.186340353671" x2="819.9220555646746" y2="436.680797662757"
+            class="intersection"></line>
+          <line x1="166.7245692959337" y1="428.494604088853" x2="819.9220555646746" y2="436.680797662757"
+            class="intersection"></line>
+          <line x1="384.38219236314904" y1="231.9346979572418" x2="186.52473759194982" y2="239.1806389082946"
+            class="intersection"></line>
+          <line x1="384.38219236314904" y1="231.9346979572418" x2="421.06559084591174" y2="458.186340353671"
+            class="intersection"></line>
+          <line x1="384.38219236314904" y1="231.9346979572418" x2="166.7245692959337" y2="428.494604088853"
+            class="intersection"></line>
+          <line x1="253.02223853352336" y1="321.0481878492594" x2="819.9220555646746" y2="436.680797662757"
+            class="intersection"></line>
+          <line x1="253.02223853352336" y1="321.0481878492594" x2="854.64629621384" y2="285.23277121525405"
+            class="intersection"></line>
+          <line x1="253.02223853352336" y1="321.0481878492594" x2="166.7245692959337" y2="428.494604088853"
+            class="intersection"></line>
+          <line x1="819.9220555646746" y1="436.680797662757" x2="335.9563369758159" y2="362.8963136677337"
+            class="intersection"></line>
+          <line x1="854.64629621384" y1="285.23277121525405" x2="335.9563369758159" y2="362.8963136677337"
+            class="intersection"></line>
+          <line x1="854.64629621384" y1="285.23277121525405" x2="421.06559084591174" y2="458.186340353671"
+            class="intersection"></line>
+          <line x1="186.52473759194982" y1="239.1806389082946" x2="421.06559084591174" y2="458.186340353671"
+            class="intersection"></line>
+          <line x1="186.52473759194982" y1="239.1806389082946" x2="166.7245692959337" y2="428.494604088853"
+            class="intersection"></line>
+        </g>
+        <g>
+          <circle r="9" cx="384.38219236314904" cy="231.9346979572418" class="intersection"></circle>
+          <circle r="9" cx="253.02223853352336" cy="321.0481878492594" class="intersection"></circle>
+          <circle r="9" cx="819.9220555646746" cy="436.680797662757" class="intersection"></circle>
+          <circle r="9" cx="854.64629621384" cy="285.23277121525405" class="intersection"></circle>
+          <circle r="9" cx="186.52473759194982" cy="239.1806389082946" class="intersection"></circle>
+          <circle r="9" cx="335.9563369758159" cy="362.8963136677337" class="intersection"></circle>
+          <circle r="9" cx="421.06559084591174" cy="458.186340353671" class="intersection"></circle>
+          <circle r="9" cx="166.7245692959337" cy="428.494604088853" class="intersection"></circle>
+        </g>
+      </g>
+    </svg></div>
+  <script src="./files/bundle.js.download"></script>
+</body>
+
+</html>
