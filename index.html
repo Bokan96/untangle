@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Untangle | Planarity Game</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Color Palette */
+            --bg-dark: #0f172a;
+            --bg-accent: #1e293b;
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+
+            --node-default: #38bdf8;
+            --node-tangled: #f43f5e;
+            --node-intersect: #fca5a5;
+
+            --edge-default: #38bdf8;
+            --edge-tangled: #f43f5e;
+
+            --glow-blue: rgba(56, 189, 248, 0.5);
+            --glow-red: rgba(244, 63, 94, 0.4);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: var(--bg-dark);
+            background-image:
+                radial-gradient(circle at 15% 50%, rgba(56, 189, 248, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.12) 0%, transparent 50%);
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Glassmorphism UI Overlay */
+        #ui-layer {
+            position: absolute;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem 3rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            z-index: 10;
+            min-width: 400px;
+            pointer-events: auto;
+            transition: all 0.3s ease;
+        }
+
+        h1 {
+            margin: 0 0 0.5rem 0;
+            font-size: 2.5rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1rem 0;
+            font-size: 1.1rem;
+        }
+
+        .stat-badge {
+            display: flex;
+            flex-direction: column;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* Forms and Buttons */
+        label {
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+
+        input[type="number"] {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 6px;
+            width: 60px;
+            font-family: inherit;
+            font-size: 1rem;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="number"]:focus {
+            border-color: #38bdf8;
+        }
+
+        button {
+            background: linear-gradient(135deg, #38bdf8, #2563eb);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-family: inherit;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px var(--glow-blue);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.7);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        /* D3 SVG Canvas Styles */
+        #vis {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+        }
+
+        /* SVG Graph Styling */
+        circle {
+            fill: var(--node-default);
+            cursor: grab;
+            stroke: var(--bg-dark);
+            stroke-width: 3px;
+            transition: fill 0.3s ease, filter 0.3s ease;
+            filter: drop-shadow(0 0 8px var(--glow-blue));
+        }
+
+        circle:active {
+            cursor: grabbing;
+        }
+
+        line {
+            stroke: var(--edge-default);
+            stroke-width: 2.5px;
+            stroke-linecap: round;
+            opacity: 0.6;
+            transition: stroke 0.3s ease, opacity 0.3s ease;
+        }
+
+        /* States via D3 Classes */
+        /* Intersect is tangled */
+        line.intersection {
+            stroke: var(--edge-tangled);
+            opacity: 0.8;
+            stroke-width: 3px;
+        }
+
+        circle.intersection {
+            fill: var(--node-tangled);
+            filter: drop-shadow(0 0 10px var(--glow-red));
+        }
+
+        circle.connected {
+            fill: #fff !important;
+            filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.8));
+        }
+
+        /* Untangled Pulse Effect */
+        @keyframes pulse-success {
+            0% {
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), 0 0 0 0 rgba(74, 222, 128, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), 0 0 0 15px rgba(74, 222, 128, 0);
+            }
+
+            100% {
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), 0 0 0 0 rgba(74, 222, 128, 0);
+            }
+        }
+
+        .victory-pulse {
+            animation: pulse-success 1.5s ease-out;
+            border-color: #4ade80 !important;
+        }
+
+        .victory-text {
+            color: #4ade80 !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Glass UI -->
+    <div id="ui-layer">
+        <h1>Untangle</h1>
+
+        <div class="stats-row">
+            <div class="stat-badge">
+                <span id="count" class="stat-value">0</span>
+                <span class="stat-label">Crossings</span>
+            </div>
+            <div class="stat-badge">
+                <span id="move-count" class="stat-value">0</span>
+                <span class="stat-label">Moves</span>
+            </div>
+            <div class="stat-badge">
+                <span id="timer" class="stat-value">0.0</span>
+                <span class="stat-label">Seconds</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div>
+                <label for="nodes">Vertices: </label>
+                <input type="number" value="8" id="nodes" min="4" max="25">
+            </div>
+            <button id="generate">Generate New Graph</button>
+        </div>
+
+        <div class="controls" style="margin-top: 1rem;">
+            <label class="checkbox-wrapper" for="intersections">
+                <input type="checkbox" id="intersections" checked>
+                Highlight tangled lines
+            </label>
+        </div>
+    </div>
+
+    <!-- Graph Container -->
+    <div id="vis"></div>
+
+    <script src="./files/bundle.js.download"></script>
+
+    <!-- Injection Script for custom behaviors over the original bundle -->
+    <script>
+        // Wait for D3 rendering to finish its initial setup
+        setTimeout(() => {
+            const observer = new MutationObserver((mutations) => {
+                const countSpan = document.getElementById('count');
+                const uiLayer = document.getElementById('ui-layer');
+                const val = parseInt(countSpan.innerText);
+
+                // If the game reaches 0 crossings (meaning we won!)
+                // Add the victory pulse effect
+                if (val === 0 && !uiLayer.classList.contains('victory-pulse')) {
+                    uiLayer.classList.add('victory-pulse');
+                    countSpan.classList.add('victory-text');
+
+                    // Remove it after animation completes so it can trigger again on new games
+                    setTimeout(() => {
+                        uiLayer.classList.remove('victory-pulse');
+                    }, 1500);
+                } else if (val > 0) {
+                    uiLayer.classList.remove('victory-pulse');
+                    countSpan.classList.remove('victory-text');
+                }
+            });
+
+            // Monitor the #count span for text changes 
+            // (the bundle.js updates this dynamically)
+            const targetNode = document.getElementById('count');
+            if (targetNode) {
+                observer.observe(targetNode, { characterData: true, childList: true, subtree: true });
+            }
+        }, 1000);
+    </script>
+</body>
+
+</html>
