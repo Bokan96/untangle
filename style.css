@@ -1,0 +1,293 @@
+:root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --border: rgba(255, 255, 255, 0.1);
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --blue: #38bdf8;
+    --red: #f43f5e;
+    --green: #4ade80;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 15% 50%, rgba(56, 189, 248, 0.12), transparent 50%),
+        radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.1), transparent 50%),
+        var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* ---------- Header ---------- */
+
+.bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 0.75rem 0.25rem;
+}
+
+h1 {
+    margin: 0 auto 0 0.25rem;
+    font-size: 1.6rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #38bdf8, #818cf8);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+button {
+    min-width: 42px;
+    min-height: 42px;
+    padding: 0 1rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--panel);
+    color: var(--text);
+    font: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+button:hover:not(:disabled) {
+    border-color: var(--blue);
+}
+
+button:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+button.primary {
+    border: 0;
+    background: linear-gradient(135deg, #38bdf8, #2563eb);
+    font-weight: 600;
+}
+
+.size {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.size button {
+    padding: 0;
+    font-size: 1.3rem;
+    line-height: 1;
+}
+
+.size-label {
+    min-width: 4.2em;
+    text-align: center;
+    color: var(--muted);
+}
+
+.size-label b,
+.stats b {
+    color: var(--text);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.stats {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 1rem;
+    padding: 0.25rem 1rem 0.5rem;
+    color: var(--muted);
+}
+
+.toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-left: auto;
+    cursor: pointer;
+}
+
+.toggle input {
+    width: 1.1rem;
+    height: 1.1rem;
+    margin: 0;
+    accent-color: var(--blue);
+}
+
+/* ---------- Board ---------- */
+
+#board {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    margin: 0 0.75rem 0.75rem;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: rgba(30, 41, 59, 0.6);
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: border-color 0.3s;
+}
+
+#graph {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+line {
+    stroke: var(--blue);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    opacity: 0.6;
+}
+
+line.crossed {
+    stroke: var(--red);
+    opacity: 0.85;
+}
+
+circle {
+    fill: var(--blue);
+    stroke: var(--bg);
+    stroke-width: 3;
+    cursor: grab;
+}
+
+circle.crossed {
+    fill: var(--red);
+}
+
+circle.neighbor {
+    fill: #fff;
+}
+
+circle.active {
+    fill: #fff;
+    stroke: var(--blue);
+}
+
+#board.dragging,
+#board.dragging circle {
+    cursor: grabbing;
+}
+
+#board.solved {
+    border-color: var(--green);
+}
+
+#board.solved line {
+    stroke: var(--green);
+    opacity: 0.85;
+}
+
+#board.solved circle {
+    fill: var(--green);
+    cursor: default;
+}
+
+#hint {
+    position: absolute;
+    inset: auto 0 1rem;
+    margin: 0;
+    text-align: center;
+    color: var(--muted);
+    pointer-events: none;
+    transition: opacity 0.4s;
+}
+
+#hint.gone {
+    opacity: 0;
+}
+
+#win {
+    position: absolute;
+    left: 50%;
+    bottom: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    width: max-content;
+    max-width: calc(100% - 2rem);
+    padding: 0.6rem 0.6rem 0.6rem 1.1rem;
+    border: 1px solid var(--green);
+    border-radius: 14px;
+    background: var(--panel);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    transform: translateX(-50%);
+    animation: pop 0.35s ease-out;
+}
+
+#win[hidden] {
+    display: none;
+}
+
+#win p {
+    margin: 0;
+    color: var(--muted);
+}
+
+#win strong {
+    color: var(--green);
+}
+
+@keyframes pop {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 1rem);
+    }
+}
+
+/* ---------- Small phones ---------- */
+
+@media (max-width: 380px) {
+    h1 {
+        font-size: 1.3rem;
+    }
+
+    .bar {
+        gap: 0.35rem;
+    }
+
+    button {
+        min-width: 38px;
+        min-height: 38px;
+        padding: 0 0.8rem;
+    }
+
+    .size-label {
+        min-width: 2em;
+    }
+
+    .size-label .unit {
+        display: none;
+    }
+
+    .stats {
+        gap: 0.25rem 0.75rem;
+        font-size: 0.9rem;
+    }
+}
